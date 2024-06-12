@@ -12,7 +12,7 @@ import random
 
 def get_order(n_samples):
     try:
-        with open(str(n_samples) + '.txt') as fp:
+        with open('Project1-Sentiment-Analysis/' + str(n_samples) + '.txt') as fp:
             line = fp.readline()
             return list(map(int, line.split(',')))
     except FileNotFoundError:
@@ -368,8 +368,16 @@ def classify(feature_matrix, theta, theta_0):
         given theta and theta_0. If a prediction is GREATER THAN zero, it
         should be considered a positive classification.
     """
-    # Your code here
-    raise NotImplementedError
+    # Compute the dot product of feature_matrix and theta, then add theta_0
+    scores = np.dot(feature_matrix, theta) + theta_0
+    
+    # Apply the classification rule: if score > 0, classify as 1, else -1
+    classifications = np.where(scores > 0, 1, -1)
+    
+    return classifications
+
+    
+
 
 
 def classifier_accuracy(
@@ -406,7 +414,22 @@ def classifier_accuracy(
         accuracy of the trained classifier on the validation data.
     """
     # Your code here
-    raise NotImplementedError
+    # Train the classifier
+    theta, theta_0 = classifier(train_feature_matrix, train_labels, **kwargs)
+    
+    # Classify the training data
+    train_predictions = classify(train_feature_matrix, theta, theta_0)
+    
+    # Classify the validation data
+    val_predictions = classify(val_feature_matrix, theta, theta_0)
+    
+    # Compute accuracy for training data
+    train_accuracy = np.mean(train_predictions == train_labels)
+    
+    # Compute accuracy for validation data
+    val_accuracy = np.mean(val_predictions == val_labels)
+    
+    return train_accuracy, val_accuracy
 
 
 
@@ -420,7 +443,7 @@ def extract_words(text):
         count as their own words.
     """
     # Your code here
-    raise NotImplementedError
+    # raise NotImplementedError
 
     for c in punctuation + digits:
         text = text.replace(c, ' ' + c + ' ')
@@ -440,14 +463,14 @@ def bag_of_words(texts, remove_stopword=False):
         integer `index`.
     """
     # Your code here
-    raise NotImplementedError
+    # raise NotImplementedError
     
     indices_by_word = {}  # maps word to unique index
     for text in texts:
         word_list = extract_words(text)
         for word in word_list:
             if word in indices_by_word: continue
-            if word in stopword: continue
+            # if word in stopword: continue
             indices_by_word[word] = len(indices_by_word)
 
     return indices_by_word
@@ -472,8 +495,7 @@ def extract_bow_feature_vectors(reviews, indices_by_word, binarize=True):
             if word not in indices_by_word: continue
             feature_matrix[i, indices_by_word[word]] += 1
     if binarize:
-        # Your code here
-        raise NotImplementedError
+        feature_matrix = np.where(feature_matrix > 0, 1, 0)
     return feature_matrix
 
 
