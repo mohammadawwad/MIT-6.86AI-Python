@@ -16,7 +16,11 @@ def closed_form(X, Y, lambda_factor):
         represents the y-axis intercept of the model and therefore X[0] = 1
     """
     # YOUR CODE HERE
-    raise NotImplementedError
+    n, d_plus_1 = X.shape
+    I = np.identity(d_plus_1)
+    # use @ for matrix multiplication istead of *
+    theta = np.linalg.inv(X.T @ X + lambda_factor * I) @ X.T @ Y
+    return theta
 
 ### Functions which are already complete, for you to use ###
 
