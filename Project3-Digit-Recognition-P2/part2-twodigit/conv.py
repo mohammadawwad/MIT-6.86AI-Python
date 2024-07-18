@@ -19,11 +19,32 @@ class CNN(nn.Module):
 
     def __init__(self, input_dimension):
         super(CNN, self).__init__()
-        # TODO initialize model layers here
+        # Initialize model layers here
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=(3, 3))
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=(3, 3))
+        self.pool = nn.MaxPool2d(kernel_size=(2, 2))
+        self.flatten = Flatten()
+        
+        # Calculate the size of the feature map after conv and pool layers
+        conv1_output_size = ((img_rows - 2) // 2, (img_cols - 2) // 2)
+        conv2_output_size = ((conv1_output_size[0] - 2) // 2, (conv1_output_size[1] - 2) // 2)
+        flattened_size = 64 * conv2_output_size[0] * conv2_output_size[1]
+
+        self.fc1 = nn.Linear(flattened_size, 128)  # Adjust dimensions based on pooling and conv layers
+        self.dropout = nn.Dropout(0.5)
+        self.fc1_out = nn.Linear(128, nb_classes)  # Output layer for the first digit
+        self.fc2_out = nn.Linear(128, nb_classes)  # Output layer for the second digit
 
     def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = self.flatten(x)
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
 
-        # TODO use model layers to predict the two digits
+        # Predict the two digits
+        out_first_digit = self.fc1_out(x)
+        out_second_digit = self.fc2_out(x)
 
         return out_first_digit, out_second_digit
 
